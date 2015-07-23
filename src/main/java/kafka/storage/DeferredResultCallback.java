@@ -36,10 +36,12 @@ public class DeferredResultCallback implements Callback {
     @Override
     public void onCompletion(final RecordMetadata metadata, final Exception e) {
         if (!deferred.isSetOrExpired()) {
+            // executor service is used to move all the effort away from producer's single thread
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
                     if (e != null) {
+                        // maybe it will make sense to accumulate all errors before setting result
                         LOGGER.error("Failed to send message to Kafka", e);
                         deferred.setErrorResult(new SendMessageException(e));
                     } else {
