@@ -28,7 +28,7 @@ public class DefaultConsumer {
     public void start() {
         connector = Consumer.createJavaConsumerConnector(properties.config());
 
-        Map<String, List<KafkaStream<String, String>>> consumerMap = connector.createMessageStreams(populateMessageStreamsMap(),
+        final Map<String, List<KafkaStream<String, String>>> consumerMap = connector.createMessageStreams(populateMessageStreamsMap(),
                 new StringDecoder(null), new StringDecoder(null));
 
         executor = Executors.newFixedThreadPool(properties.getNumberOfThreads());
@@ -50,7 +50,7 @@ public class DefaultConsumer {
     }
 
     private Map<String, Integer> populateMessageStreamsMap() {
-        Map<String, Integer> topicCountMap = new HashMap<>();
+        final Map<String, Integer> topicCountMap = new HashMap<>();
         topicCountMap.put(properties.getTopicName(), properties.getNumberOfThreads());
         return topicCountMap;
     }

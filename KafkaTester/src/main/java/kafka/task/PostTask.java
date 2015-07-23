@@ -1,6 +1,5 @@
 package kafka.task;
 
-import kafka.Document;
 import kafka.Documents;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -12,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
 
 import static javax.ws.rs.core.Response.Status.CREATED;
 
@@ -27,10 +26,10 @@ public class PostTask extends AbstractTask implements Runnable {
 
     private static final long DEFAULT_TIMEOUT_PER_POST = 1000L;
 
-    private final ConcurrentLinkedQueue<Document> storage;
+    private final ExecutorService executorService;
 
-    public PostTask(final ConcurrentLinkedQueue<Document> storage) {
-        this.storage = storage;
+    public PostTask(final ExecutorService executorService) {
+        this.executorService = executorService;
     }
 
     @Override
@@ -52,7 +51,8 @@ public class PostTask extends AbstractTask implements Runnable {
                 .post(Entity.entity(documents, MediaType.APPLICATION_XML));
 
         if (validateStatus(response)) {
-            parseAndSave(response);
+            final Documents docs = parse(response);
+            executorService.submit(new GetTask(docs));
         } else {
             LOGGER.error("POST. Invalid response status {} for request {}", response.getStatus(), documents);
         }
@@ -64,13 +64,13 @@ public class PostTask extends AbstractTask implements Runnable {
         return response.getStatus() == CREATED.getStatusCode();
     }
 
-    private void parseAndSave(final Response response) {
+    private Documents parse(final Response response) {
         final String entity = response.readEntity(String.class);
 
         final Documents docs = deserializeDocs(entity);
-        LOGGER.info("POST. Documents successfully sent {}", docs);
+        LOGGER.info("POST. Documents successfully sent and parsed {}", docs);
 
-        storage.addAll(docs.getDocs());
+        return docs;
     }
 
     private String generateContent() {
