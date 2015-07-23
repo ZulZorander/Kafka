@@ -7,6 +7,9 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author dmytro.malovichko
+ */
 @JacksonXmlRootElement(localName = "documents")
 public class Documents {
 

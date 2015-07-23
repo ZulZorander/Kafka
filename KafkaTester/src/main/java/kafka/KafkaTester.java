@@ -30,6 +30,17 @@ public class KafkaTester {
         executorService.submit(new PostTask(storage));
 
         executorService.submit(new GetTask(storage));
+
+        addCleanupHook();
+    }
+
+    private void addCleanupHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                executorService.shutdown();
+            }
+        });
     }
 
 }
