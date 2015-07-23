@@ -1,0 +1,35 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("io.spring.gradle:dependency-management-plugin:0.5.2.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+jar {
+    baseName = 'KafkaConsumer'
+    version = '0.0.1-SNAPSHOT'
+}
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile("org.apache.kafka:kafka_2.10:0.8.2.0")
+    compile("commons-io:commons-io:2.4")
+    compile("org.apache.commons:commons-lang3:3.4")
+    compile("org.slf4j:slf4j-api:1.7.12")
+    compile("org.slf4j:slf4j-simple:1.7.12")
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
