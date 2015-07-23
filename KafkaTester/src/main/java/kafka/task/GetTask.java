@@ -18,7 +18,7 @@ public class GetTask extends AbstractTask implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetTask.class);
 
-    private static final long DEFAULT_TIMEOUT_PER_GET = 1000L;
+    private static final long DEFAULT_TIMEOUT_BEFORE_GET = 2000L;
 
     private final Documents docs;
 
@@ -28,7 +28,7 @@ public class GetTask extends AbstractTask implements Runnable {
 
     @Override
     public void run() {
-        sleep(DEFAULT_TIMEOUT_PER_GET);
+        sleep(DEFAULT_TIMEOUT_BEFORE_GET);
         get();
     }
 
