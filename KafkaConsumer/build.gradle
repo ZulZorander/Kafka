@@ -1,14 +1,20 @@
 buildscript {
+    ext {
+        springBootVersion = '1.2.5.RELEASE'
+    }
     repositories {
         mavenCentral()
     }
     dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("io.spring.gradle:dependency-management-plugin:0.5.2.RELEASE")
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'io.spring.dependency-management'
 
 jar {
     baseName = 'KafkaConsumer'
@@ -23,11 +29,13 @@ repositories {
 }
 
 dependencies {
+    compile("org.springframework.boot:spring-boot-starter") {
+        exclude module: 'log4j-over-slf4j'
+        exclude module: 'logback-classic'
+    }
     compile("org.apache.kafka:kafka_2.10:0.8.2.0")
     compile("commons-io:commons-io:2.4")
     compile("org.apache.commons:commons-lang3:3.4")
-    compile("org.slf4j:slf4j-api:1.7.12")
-    compile("org.slf4j:slf4j-simple:1.7.12")
 }
 
 task wrapper(type: Wrapper) {

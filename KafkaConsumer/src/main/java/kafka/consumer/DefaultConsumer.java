@@ -25,7 +25,7 @@ public class DefaultConsumer {
         this.properties = properties;
     }
 
-    public void start() {
+    public void init() {
         connector = Consumer.createJavaConsumerConnector(properties.config());
 
         final Map<String, List<KafkaStream<String, String>>> consumerMap = connector.createMessageStreams(populateMessageStreamsMap(),
@@ -36,9 +36,9 @@ public class DefaultConsumer {
         startThreads(consumerMap);
     }
 
-    public void stop() {
+    public void destroy() {
         if (connector != null) connector.shutdown();
-        if (executor != null) executor.shutdown();
+        if (executor != null) executor.shutdownNow();
     }
 
     private void startThreads(final Map<String, List<KafkaStream<String, String>>> consumerMap) {
@@ -54,5 +54,4 @@ public class DefaultConsumer {
         topicCountMap.put(properties.getTopicName(), properties.getNumberOfThreads());
         return topicCountMap;
     }
-
 }

@@ -34,8 +34,8 @@ public class KafkaTester {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                executorService.shutdown();
-                postExecutorService.shutdown();
+                executorService.shutdownNow();
+                postExecutorService.shutdownNow();
             }
         });
     }

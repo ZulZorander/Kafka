@@ -41,7 +41,7 @@ public class KafkaApplication {
         return new KafkaStorage();
     }
 
-    @Bean(destroyMethod = "shutdown")
+    @Bean(destroyMethod = "shutdownNow")
     public ExecutorService kafkaExecutorService(@Value("${message.batch.executor.pool.size}") final int poolSize) {
         return Executors.newFixedThreadPool(poolSize);
     }
