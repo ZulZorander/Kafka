@@ -20,8 +20,6 @@ public class ConsumerProperties {
 
     private String zookeeperSyncTimeMs;
 
-    private String autoCommitIntervalMs;
-
     private int numberOfThreads;
 
     private String storagePath;
@@ -36,7 +34,7 @@ public class ConsumerProperties {
         properties.put("group.id", groupId);
         properties.put("zookeeper.session.timeout.ms", zookeeperSessionTimeoutMs);
         properties.put("zookeeper.sync.time.ms", zookeeperSyncTimeMs);
-        properties.put("auto.commit.interval.ms", autoCommitIntervalMs);
+        properties.put("auto.commit.enable", Boolean.FALSE.toString());
         return properties;
     }
 
@@ -80,7 +78,4 @@ public class ConsumerProperties {
         this.zookeeperSyncTimeMs = zookeeperSyncTimeMs;
     }
 
-    public void setAutoCommitIntervalMs(String autoCommitIntervalMs) {
-        this.autoCommitIntervalMs = autoCommitIntervalMs;
-    }
 }

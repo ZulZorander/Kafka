@@ -22,7 +22,11 @@ public class ConsumerThread implements Runnable {
 
     private final int threadNumber;
 
-    public ConsumerThread(final KafkaStream<String, String> stream, final int threadNumber, final String storagePath) {
+    private final OffsetCommitSemaphore offsetCommitSemaphore;
+
+    public ConsumerThread(final OffsetCommitSemaphore offsetCommitSemaphore, final KafkaStream<String, String> stream,
+                          final int threadNumber, final String storagePath) {
+        this.offsetCommitSemaphore = offsetCommitSemaphore;
         this.threadNumber = threadNumber;
         this.stream = stream;
         this.storagePath = storagePath;
@@ -31,10 +35,22 @@ public class ConsumerThread implements Runnable {
     @Override
     public void run() {
         for (MessageAndMetadata<String, String> data : stream) {
-            LOGGER.info("Received message on thread {}, key {}, message {}", threadNumber, data.key(), data.message());
-            save(data.key(), data.message());
+            LOGGER.info("Received message in thread {}, key {}, message {}", threadNumber, data.key(), data.message());
+            processMessage(data);
         }
         LOGGER.info("Shutting down Thread: " + threadNumber);
+    }
+
+    private void processMessage(MessageAndMetadata<String, String> data) {
+        try {
+            offsetCommitSemaphore.acquire();
+            // maybe it does makes sense to do IO in separate thread, testing is needed
+            save(data.key(), data.message());
+        } catch (InterruptedException e) {
+            LOGGER.error(String.format("Failed to acquire semaphore in thread %s, cannot save key %s, message %s ", threadNumber, data.key(), data.message()), e);
+        } finally {
+            offsetCommitSemaphore.release();
+        }
     }
 
     private void save(final String id, final String document) {

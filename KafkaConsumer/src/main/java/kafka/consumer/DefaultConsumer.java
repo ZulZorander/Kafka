@@ -33,7 +33,9 @@ public class DefaultConsumer {
 
         executor = Executors.newFixedThreadPool(properties.getNumberOfThreads());
 
-        startThreads(consumerMap);
+        final OffsetCommitSemaphore offsetCommitSemaphore = new OffsetCommitSemaphore(connector, properties.getNumberOfThreads());
+        startThreads(consumerMap, offsetCommitSemaphore);
+        offsetCommitSemaphore.init();
     }
 
     public void destroy() {
@@ -41,10 +43,10 @@ public class DefaultConsumer {
         if (executor != null) executor.shutdownNow();
     }
 
-    private void startThreads(final Map<String, List<KafkaStream<String, String>>> consumerMap) {
+    private void startThreads(final Map<String, List<KafkaStream<String, String>>> consumerMap, final OffsetCommitSemaphore offsetCommitSemaphore) {
         int threadNumber = 0;
         for (final KafkaStream<String, String> stream : consumerMap.get(properties.getTopicName())) {
-            executor.submit(new ConsumerThread(stream, threadNumber, properties.getStoragePath()));
+            executor.submit(new ConsumerThread(offsetCommitSemaphore, stream, threadNumber, properties.getStoragePath()));
             threadNumber++;
         }
     }
@@ -54,4 +56,5 @@ public class DefaultConsumer {
         topicCountMap.put(properties.getTopicName(), properties.getNumberOfThreads());
         return topicCountMap;
     }
+
 }
