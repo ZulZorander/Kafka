@@ -43,6 +43,7 @@ public class ConsumerThread implements Runnable {
 
     private void processMessage(MessageAndMetadata<String, String> data) {
         try {
+            offsetCommitSemaphore.lazyInit(); // not too fancy way of initializing semaphore
             offsetCommitSemaphore.acquire();
             // maybe it does makes sense to do IO in separate thread, testing is needed
             save(data.key(), data.message());

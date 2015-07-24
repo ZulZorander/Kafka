@@ -28,14 +28,13 @@ public class DefaultConsumer {
     public void init() {
         connector = Consumer.createJavaConsumerConnector(properties.config());
 
-        final Map<String, List<KafkaStream<String, String>>> consumerMap = connector.createMessageStreams(populateMessageStreamsMap(),
+        final Map<String, List<KafkaStream<String, String>>> consumerMap = connector.createMessageStreams(populateTopicMap(),
                 new StringDecoder(null), new StringDecoder(null));
 
         executor = Executors.newFixedThreadPool(properties.getNumberOfThreads());
 
         final OffsetCommitSemaphore offsetCommitSemaphore = new OffsetCommitSemaphore(connector, properties.getNumberOfThreads());
         startThreads(consumerMap, offsetCommitSemaphore);
-        offsetCommitSemaphore.init();
     }
 
     public void destroy() {
@@ -51,7 +50,7 @@ public class DefaultConsumer {
         }
     }
 
-    private Map<String, Integer> populateMessageStreamsMap() {
+    private Map<String, Integer> populateTopicMap() {
         final Map<String, Integer> topicCountMap = new HashMap<>();
         topicCountMap.put(properties.getTopicName(), properties.getNumberOfThreads());
         return topicCountMap;
